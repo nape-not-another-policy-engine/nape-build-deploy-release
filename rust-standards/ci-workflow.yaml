@@ -1,0 +1,67 @@
+name: Rust Standard - CI Workflow
+
+on:
+  workflow_call:
+    secrets:
+      GITHUB_TOKEN:
+        required: true
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v3
+
+      - name: Set up Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          profile: minimal
+
+      - name: Install cargo-edit
+        run: cargo install cargo-edit
+
+      - name: Run 'cargo upgrade'
+        run: cargo upgrade
+
+      - name: Check for changes in Cargo.toml
+        id: check_changes
+        run: |
+          if [[ `git status --porcelain` ]]; then
+            echo "Changes detected in Cargo.toml files"
+            echo "changes=true" >> $GITHUB_ENV
+          else
+            echo "No changes detected in Cargo.toml files"
+            echo "changes=false" >> $GITHUB_ENV
+          fi
+            
+      - name: Commit changes if any
+        if: env.changes == 'true'
+        run: |
+            echo "\n---- Import GPG Key for Verified Signature ----\n"
+            echo "${{ secrets.NAPE_BOT_GPG }}" | gpg --import
+            NAPE_BOT_GPG_KEY_ID=$(gpg --list-secret-keys --keyid-format LONG | grep 'sec' | awk '{print $2}' | cut -d'/' -f2)
+            echo "NAPE_BOT_GPG_KEY_ID=$GPG_KEY_ID" >> $GITHUB_ENV
+            echo "\n---- GPG Key Successfully Imported for Verified Signature ----\n"
+            
+            echo "\n---- Update Git Configuration for Signing Commits with GPG ----\n"
+            git config user.name "🤖 NAPE Bot 🤖"
+            git config user.email "${{ secrets.NAPE_BOT_EMAIL }}"
+            git config user.signingkey ${{ env.NAPE_BOT_GPG_KEY_ID }}
+            git config gpg.program gpg
+            git config commit.gpgsign true
+            echo "\n---- Update Git Configuration Success for Signing Commits with GPG ----\n"
+
+            echo "\n---- NAPE Bot Commit & Push for Cargo.toml Updates ----\n"
+            git add .
+            git commit -S -m "Auto-update Cargo.toml after cargo upgrade [ci skip]"
+            git push origin HEAD:${{ github.ref }}
+            echo "\n---- NAPE Bot Commit & Push Success for Cargo.toml Updates ----\n"
+
+      - name: Run tests
+        run: cargo test --all-targets --all-features -- --test-threads=1 --nocapture
+
+    permissions:
+      contents: write
