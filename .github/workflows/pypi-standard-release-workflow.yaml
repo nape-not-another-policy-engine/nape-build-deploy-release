@@ -16,7 +16,12 @@ jobs:
     env:
       PYPI_URL: ${{ inputs.pypi_url }}
 
+
     steps:
+    - name: Debug - Check PYPI_URL
+      run: |
+            echo "PYPI_URL is set to: $PYPI_URL"
+
     - name: Checkout the code
       uses: actions/checkout@v3
 
