@@ -1,0 +1,27 @@
+name: Push Test File to S3
+
+on:
+  workflow_call:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v2
+      with:
+        role-to-assume: ${{ secrets.NAPE_AWS_TRUST_ROLE_NAPE_CLI }}
+        aws-region: ${{ secrets.NAPE_AWS_REGION }}
+        role-session-name: github-actions-s3
+
+    - name: Create a test file with date and time
+      run: |
+        echo "This is a test file created on $(date)" > test-file.txt
+
+    - name: Push file to S3
+      run: |
+        aws s3 cp test-file.txt s3://nape-binary-repository/nape-cli/test-file.txt
