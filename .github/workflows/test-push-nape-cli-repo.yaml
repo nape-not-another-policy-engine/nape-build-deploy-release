@@ -15,7 +15,7 @@ jobs:
       uses: aws-actions/configure-aws-credentials@v2
       with:
         role-to-assume: ${{ secrets.NAPE_AWS_TRUST_ROLE_NAPE_CLI }}
-        aws-region: ${{secrets.NAPE_AWS_REGION}}
+        aws-region: ${{ secrets.NAPE_AWS_REGION }}
         role-session-name: github-actions-s3
 
     - name: Create a test file with date and time
