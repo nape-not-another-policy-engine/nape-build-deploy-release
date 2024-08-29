@@ -23,7 +23,7 @@ jobs:
       - name: Run 'cargo upgrade'
         run: cargo upgrade
 
-      - name: Check for changes in Cargo.toml
+      - name: Check for changes in Cargo.toml after cargo upgrade
         id: check_changes
         run: |
           if [[ `git status --porcelain` ]]; then
@@ -34,7 +34,7 @@ jobs:
             echo "changes=false" >> $GITHUB_ENV
           fi
             
-      - name: Commit changes if any
+      - name: Commit changes if Cargo.toml was update
         if: env.changes == 'true'
         run: |
             echo "\n---- Import GPG Key for Verified Signature ----\n"
@@ -59,6 +59,3 @@ jobs:
 
       - name: Run tests
         run: cargo test --all-targets --all-features -- --test-threads=1 --nocapture
-
-    permissions:
-      contents: write
