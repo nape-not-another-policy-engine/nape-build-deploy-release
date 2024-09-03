@@ -16,7 +16,7 @@ jobs:
     env:
       PYPI_URL: ${{ inputs.pypi_url }}
       TWINE_USERNAME: ${{ secrets.NAPE_EVAL_PYPI_USERNAME }}
-      TWINE_PASSWORD: ${{ secrets.NAPE_EVAL_PYPI_PASSWORD }}
+      TWINE_PASSWORD: ${{ secrets.NAPE_EVAL_PYPI_TEST_PASSWORD }}
 
     steps:
 
