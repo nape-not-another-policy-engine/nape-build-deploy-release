@@ -57,5 +57,11 @@ jobs:
             git push origin HEAD:${{ github.ref }}
             echo "\n---- NAPE Bot Commit & Push Success for Cargo.toml Updates ----\n"
 
-      - name: Run tests
+      - name: Install PIP
+        run: sudo apt-get install -y python3-pip
+
+      - name: Install NAPE PIP package for 'nape-eval' cli
+        run: pip install nape
+
+      - name: Run Unit Tests
         run: cargo test --all-targets --all-features -- --test-threads=1 --nocapture
