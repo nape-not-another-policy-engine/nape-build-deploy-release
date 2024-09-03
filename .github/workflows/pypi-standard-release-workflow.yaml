@@ -21,7 +21,7 @@ jobs:
         if [ "${{ inputs.publish_target }}" == "test" ]; then
           echo "Using test publish credentials"
           TWINE_PASSWORD=${{ secrets.NAPE_EVAL_PYPI_TEST_PASSWORD }}
-          echo"TWINE_PASSWORD=${TWINE_PASSWORD}" >> $GITHUB_ENV
+          echo "TWINE_PASSWORD=${TWINE_PASSWORD}" >> $GITHUB_ENV
           echo "PYPI_URL=https://test.pypi.org/legacy/" >> $GITHUB_ENV
         elif [ "${{ inputs.publish_target }}" == "prod" ]; then
           echo "Using production publish credentials"
