@@ -25,7 +25,8 @@ jobs:
           echo "PYPI_URL=https://test.pypi.org/legacy/" >> $GITHUB_ENV
         elif [ "${{ inputs.publish_target }}" == "prod" ]; then
           echo "Using production publish credentials"
-          echo "TWINE_PASSWORD=${{ secrets.NAPE_EVAL_PYPI_PASSWORD }}" >> $GITHUB_ENV
+          TWINE_PASSWORD=${{ secrets.NAPE_EVAL_PYPI_PASSWORD }}
+          echo "TWINE_PASSWORD=${TWINE_PASSWORD}" >> $GITHUB_ENV
           echo "PYPI_URL=https://upload.pypi.org/legacy/" >> $GITHUB_ENV
         else
           echo "Error: Invalid publish_target '${{ inputs.publish_target }}' provided. It must be either 'test' or 'prod'."
