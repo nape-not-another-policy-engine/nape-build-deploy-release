@@ -3,22 +3,31 @@ name: Build and Publish to PyPI
 on:
     workflow_call:
         inputs:
-            pypi_url:
-                description: 'The repository URL for PyPI or Test PyPI'
+            publish_target:
+                description: 'The target for publishing: "test" or "prod"'
                 required: true
                 type: string
 
 jobs:
   build-and-publish:
     runs-on: ubuntu-latest
-    environment: release
-    
-    env:
-      PYPI_URL: ${{ inputs.pypi_url }}
-      TWINE_USERNAME: ${{ secrets.NAPE_EVAL_PYPI_USERNAME }}
-      TWINE_PASSWORD: ${{ secrets.NAPE_EVAL_PYPI_TEST_PASSWORD }}
 
     steps:
+
+    - name: Set the publish target credentials as environment variables.
+      id: set-publish-target-credentials
+      run: |
+        echo "TWINE_USERNAME=${{ secrets.NAPE_EVAL_PYPI_USERNAME }}" >> $GITHUB_ENV
+        if [ "${{ inputs.publish_target }}" == "test" ]; then
+          echo "Using test publish credentials"
+          echo "TWINE_PASSWORD=${{ secrets.NAPE_EVAL_PYPI_TEST_PASSWORD }}" >> $GITHUB_ENV
+        elif [ "${{ inputs.publish_target }}" == "prod" ]; then
+          echo "Using production publish credentials"
+          echo "TWINE_PASSWORD=${{ secrets.NAPE_EVAL_PYPI_PASSWORD }}" >> $GITHUB_ENV
+        else
+          echo "Error: Invalid publish_target '${{ inputs.publish_target }}' provided. It must be either 'test' or 'prod'."
+          exit 1
+        fi
 
     - name: Checkout the code
       uses: actions/checkout@v3
@@ -28,7 +37,7 @@ jobs:
       with:
         python-version: '3.x'
 
-    - name: Install Dependencies & Build Tools
+    - name: Install Python dependencies & build tools
       run: |
         python -m pip install --upgrade pip
         python -m pip install setuptools wheel twine build
@@ -36,5 +45,5 @@ jobs:
     - name: Build nape-evaluator
       run: make build-release
 
-    - name: Publish nape-evaluator to PYPI
+    - name: Publish nape-evaluator
       run: make pypi-publish
