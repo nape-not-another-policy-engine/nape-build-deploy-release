@@ -15,7 +15,8 @@ jobs:
     
     env:
       PYPI_URL: ${{ inputs.pypi_url }}
-
+      TWINE_USERNAME: ${{ secrets.NAPE_EVAL_PYPI_USERNAME }}
+      TWINE_PASSWORD: ${{ secrets.NAPE_EVAL_PYPI_PASSWORD }}
 
     steps:
 
@@ -27,16 +28,13 @@ jobs:
       with:
         python-version: '3.x'
 
-    - name: Build
+    - name: Install Dependencies & Build Tools
       run: |
         python -m pip install --upgrade pip
         python -m pip install setuptools wheel twine build
 
-    - name: Build and Publish
+    - name: Build nape-evaluator
       run: make build-release
 
-    - name: Publish package to PYPI
-      uses: pypa/gh-action-pypi-publish@release/v1
-      with:
-        repository-url: ${{ inputs.pypi_url }}
-        packages-dir: build-output/
+    - name: Publish nape-evaluator to PYPI
+      run: make pypi-publish
