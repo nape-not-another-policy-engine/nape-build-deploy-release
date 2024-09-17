@@ -1,0 +1,13 @@
+# .cargo/config.toml
+
+[target.x86_64-apple-darwin]
+linker = "zig cc"
+
+[target.aarch64-apple-darwin]
+linker = "zig cc"
+
+[target.aarch64-unknown-linux-musl]
+linker = "zig cc"
+
+[target.x86_64-unknown-linux-musl]
+linker = "zig cc"

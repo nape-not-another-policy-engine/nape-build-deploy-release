@@ -38,6 +38,8 @@ All of the following aspects are container within the ```nape-cli/```
 
 ### Subdirectories
 
+- ```.cargo/```
+  - All rust compilation related files which provide compilation configuration for various OS/CPU support.
 - ```action/```
   - Python scripts used by the ```./nape-cli/Makefile```
   - **DESIGN DECISION** - Python scripts are used because they can be independtly testable via a unit test to verify the behavior for each script, as opposed to manual push-and-click testing
