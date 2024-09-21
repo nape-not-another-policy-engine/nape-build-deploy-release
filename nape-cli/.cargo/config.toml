@@ -1,5 +1,4 @@
 # .cargo/config.toml
-
 [target.x86_64-apple-darwin]
 linker = "zig cc"
 
@@ -8,6 +7,8 @@ linker = "zig cc"
 
 [target.aarch64-unknown-linux-musl]
 linker = "zig cc"
+env = { "OPENSSL_LIB_DIR" = "/usr/lib/aarch64-linux-gnu", "OPENSSL_INCLUDE_DIR" = "/usr/include/aarch64-linux-gnu/openssl" }
 
 [target.x86_64-unknown-linux-musl]
 linker = "zig cc"
+env = { "OPENSSL_LIB_DIR" = "/usr/lib/x86_64-linux-gnu", "OPENSSL_INCLUDE_DIR" = "/usr/include/openssl" }
