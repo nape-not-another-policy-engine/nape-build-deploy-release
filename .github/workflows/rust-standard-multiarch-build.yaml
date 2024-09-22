@@ -19,6 +19,7 @@ on:
             artifacts_paths:
                 description: 'A list of paths to the built artifacts.'
                 value: ${{ jobs.build.outputs.artifacts_paths }}
+
 jobs:
   build:
     runs-on: ${{ matrix.os }}
@@ -66,7 +67,7 @@ jobs:
           sudo apt-get install -y gcc-multilib musl-tools gcc-aarch64-linux-gnu
       
       - name: Build Release
-        run: make ma-release-build PROJECT=${{ github.event.inputs.project }} OS_ARCH_TARGET=${{ matrix.target }}
+        run: make ma-release-build PROJECT=${{ github.event.inputs.rust-project }} OS_ARCH_TARGET=${{ matrix.target }}
         
       - name: Upload Binary
         uses: actions/upload-artifact@v3
