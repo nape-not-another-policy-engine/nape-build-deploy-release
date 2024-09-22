@@ -1,0 +1,84 @@
+name: Rust Standard - Multi-Architecture Compile Workflow
+
+on:
+    workflow_call:
+        inputs:
+            rust-project:
+                description: 'The Rust project that is being built and pushed.'
+                required: true
+                type: string
+            binary-repo-name:
+                description: 'The name to store this as in the binary repo.'
+                required: true
+                type: string
+            version:
+                description: 'The version to store this as in the binary repo.'
+                required: true
+                type: string
+        outputs:
+            artifacts_paths:
+                description: 'A list of paths to the built artifacts.'
+                value: ${{ jobs.build.outputs.artifacts_paths }}
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            target: x86_64-unknown-linux-gnu
+            arch: x86_64
+          - os: ubuntu-latest
+            target: x86_64-unknown-linux-musl
+            arch: x86_64
+          - os: macos-latest
+            target: x86_64-apple-darwin
+            arch: x86_64
+          - os: windows-latest
+            target: x86_64-pc-windows-msvc
+            arch: x86_64
+          - os: ubuntu-latest
+            target: aarch64-unknown-linux-gnu
+            arch: aarch64
+          - os: ubuntu-latest
+            target: aarch64-unknown-linux-musl
+            arch: aarch64
+          - os: macos-12
+            target: aarch64-apple-darwin
+            arch: aarch64
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v3
+
+      - name: Install Rust toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: stable
+          target: ${{ matrix.target }}
+          override: true
+
+      - name: Install Dependencies (Ubuntu)
+        if: runner.os == 'Linux' && matrix.target != 'x86_64-unknown-linux-gnu'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gcc-multilib musl-tools gcc-aarch64-linux-gnu
+      
+      - name: Build Release
+        run: make ma-release-build PROJECT=${{ github.event.inputs.project }} OS_ARCH_TARGET=${{ matrix.target }}
+        
+      - name: Upload Binary
+        uses: actions/upload-artifact@v3
+        with:
+          name: nape-cli-${{ github.event.inputs.version }}-${{ matrix.target }}
+          path: |
+            target/${{ matrix.target }}/release/*
+                                                 
+      - name: Set Output Artifact Path
+        id: set_artifacts
+        run: echo "::set-output name=artifacts::${{ matrix.target }}-${{ github.event.inputs.version }}"
+
+    outputs:
+      artifacts_paths: ${{ steps.set_artifacts.outputs.artifacts }}
+                                                           
