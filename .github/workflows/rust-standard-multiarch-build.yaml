@@ -60,11 +60,11 @@ jobs:
           target: ${{ matrix.target }}
           override: true
 
-      - name: Install Dependencies (Ubuntu)
-        if: runner.os == 'Linux' && matrix.target != 'x86_64-unknown-linux-gnu'
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y gcc-multilib musl-tools gcc-aarch64-linux-gnu
+#      - name: Install Dependencies (Ubuntu)
+#        if: runner.os == 'Linux' && matrix.target != 'x86_64-unknown-linux-gnu'
+#        run: |
+#          sudo apt-get update
+#          sudo apt-get install -y gcc-multilib musl-tools gcc-aarch64-linux-gnu
       
       - name: Build Release
         run: make ma-release-build PROJECT=${{ inputs.rust-project }} OS_ARCH_TARGET=${{ matrix.target }}
