@@ -39,10 +39,10 @@ jobs:
           - os: ubuntu-latest
             target: aarch64-unknown-linux-musl
             arch: aarch64
-          - os: macos-latest
+          - os: macos-12
             target: x86_64-apple-darwin
             arch: x86_64
-          - os: macos-12
+          - os: macos-latest
             target: aarch64-apple-darwin
             arch: aarch64
           - os: windows-latest
