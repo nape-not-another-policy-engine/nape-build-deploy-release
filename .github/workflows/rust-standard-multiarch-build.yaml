@@ -66,19 +66,36 @@ jobs:
         run: |
           # Combo 1: x86_64 to aarch64-unknown-linux-gnu
           if [ "${{ matrix.target }}" == "aarch64-unknown-linux-gnu" ]; then
-            sudo apt-get install -y gcc-aarch64-linux-gnu
+            sudo apt-get install -y gcc-aarch64-linux-gnu pkg-config libssl-dev
 
           # Combo 2: x86_64 to x86_64-unknown-linux-musl
           elif [ "${{ matrix.target }}" == "x86_64-unknown-linux-musl" ]; then
-            sudo apt-get install -y musl-tools
+            sudo apt-get install -y musl-tools pkg-config libssl-dev
 
           # Combo 3: x86_64 to aarch64-unknown-linux-musl
           elif [ "${{ matrix.target }}" == "aarch64-unknown-linux-musl" ]; then
-            sudo apt-get install -y gcc-aarch64-linux-gnu musl-tools
+            sudo apt-get install -y gcc-aarch64-linux-gnu musl-tools pkg-config libssl-dev
           fi
 
           sudo apt-get update
-      
+
+      - name: Set up OpenSSL and pkg-config for Cross-Compilation
+        if: runner.os == 'Linux' && matrix.target != 'x86_64-unknown-linux-gnu'
+        run: |
+
+          if [ "${{ matrix.target }}" == "aarch64-unknown-linux-gnu" ]; then
+            export OPENSSL_DIR=/usr/aarch64-linux-gnu
+            export PKG_CONFIG_PATH=/usr/aarch64-linux-gnu/lib/pkgconfig
+
+          elif [ "${{ matrix.target }}" == "x86_64-unknown-linux-musl" ]; then
+            export OPENSSL_DIR=/usr/local/musl
+            export PKG_CONFIG_PATH=/usr/local/musl/lib/pkgconfig
+
+          elif [ "${{ matrix.target }}" == "aarch64-unknown-linux-musl" ]; then
+            export OPENSSL_DIR=/usr/aarch64-linux-musl
+            export PKG_CONFIG_PATH=/usr/aarch64-linux-musl/lib/pkgconfig
+          fi
+
       - name: Build Release
         run: make ma-release-build PROJECT=${{ inputs.rust-project }} OS_ARCH_TARGET=${{ matrix.target }}
         
