@@ -27,9 +27,9 @@ jobs:
       fail-fast: false # Ensure that jobs keep processing if one fails
       matrix:
         include:
-          - os: ubuntu-latest
-            target: x86_64-unknown-linux-gnu
-            arch: x86_64
+#          - os: ubuntu-latest
+#            target: x86_64-unknown-linux-gnu
+#            arch: x86_64
           - os: ubuntu-latest
             target: aarch64-unknown-linux-gnu
             arch: aarch64
@@ -39,15 +39,15 @@ jobs:
           - os: ubuntu-latest
             target: aarch64-unknown-linux-musl
             arch: aarch64
-          - os: macos-12
-            target: x86_64-apple-darwin
-            arch: x86_64
-          - os: macos-latest
-            target: aarch64-apple-darwin
-            arch: aarch64
-          - os: windows-latest
-            target: x86_64-pc-windows-msvc
-            arch: x86_64
+#          - os: macos-12
+#            target: x86_64-apple-darwin
+#            arch: x86_64
+#          - os: macos-latest
+#            target: aarch64-apple-darwin
+#            arch: aarch64
+#          - os: windows-latest
+#            target: x86_64-pc-windows-msvc
+#            arch: x86_64
 
     steps:
       - name: Check out code
@@ -61,11 +61,23 @@ jobs:
           target: ${{ matrix.target }}
           override: true
 
-#      - name: Install Dependencies (Ubuntu)
-#        if: runner.os == 'Linux' && matrix.target != 'x86_64-unknown-linux-gnu'
-#        run: |
-#          sudo apt-get update
-#          sudo apt-get install -y gcc-multilib musl-tools gcc-aarch64-linux-gnu
+      - name: Install Dependencies for Cross-Compilation (Ubuntu)
+        if: runner.os == 'Linux'
+        run: |
+          # Combo 1: x86_64 to aarch64-unknown-linux-gnu
+          if [ "${{ matrix.target }}" == "aarch64-unknown-linux-gnu" ]; then
+            sudo apt-get install -y gcc-aarch64-linux-gnu
+
+          # Combo 2: x86_64 to x86_64-unknown-linux-musl
+          elif [ "${{ matrix.target }}" == "x86_64-unknown-linux-musl" ]; then
+            sudo apt-get install -y musl-tools
+
+          # Combo 3: x86_64 to aarch64-unknown-linux-musl
+          elif [ "${{ matrix.target }}" == "aarch64-unknown-linux-musl" ]; then
+            sudo apt-get install -y gcc-aarch64-linux-gnu musl-tools
+          fi
+
+          sudo apt-get update
       
       - name: Build Release
         run: make ma-release-build PROJECT=${{ inputs.rust-project }} OS_ARCH_TARGET=${{ matrix.target }}
