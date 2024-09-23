@@ -102,13 +102,13 @@ jobs:
       - name: Upload Binary
         uses: actions/upload-artifact@v3
         with:
-          name: nape-cli-${{ github.event.inputs.version }}-${{ matrix.target }}
+          name: nape-cli-${{ inputs.version }}-${{ matrix.target }}
           path: |
             target/${{ matrix.target }}/release/*
                                                  
       - name: Set Output Artifact Path
         id: set_artifacts
-        run: echo "::set-output name=artifacts::${{ matrix.target }}-${{ github.event.inputs.version }}"
+        run: echo "::set-output name=artifacts::${{ matrix.target }}-${{ inputs.version }}"
 
     outputs:
       artifacts_paths: ${{ steps.set_artifacts.outputs.artifacts }}
