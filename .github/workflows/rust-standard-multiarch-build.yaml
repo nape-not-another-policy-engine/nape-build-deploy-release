@@ -100,7 +100,7 @@ jobs:
         run: make ma-release-build PROJECT=${{ inputs.rust-project }} OS_ARCH_TARGET=${{ matrix.target }}
         
       - name: Upload Binary
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: nape-cli-${{ inputs.version }}-${{ matrix.target }}
           path: |
